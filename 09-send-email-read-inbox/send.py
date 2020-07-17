@@ -3,26 +3,32 @@ import requests
 from datetime import datetime
 
 from formatting import format_msg
+from send_mail import send_mail
 
 
-def send(name: str, website: str = None, verbose: bool = False):
+def send(
+    name: str, website: str = None, to_email: str = None, verbose: bool = False
+):
     """
     Send formatted message.
     """
+    assert to_email is not None
+
     if website is not None:
         msg = format_msg(name=name, website=website)
     else:
         msg = format_msg(name=name)
 
     if verbose:
-        print(name, website)
-    # Send the message
-    response = requests.get("http://httpbin.org/json")
+        print(name, website, to_email)
 
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return "There was an error!"
+    # Try sending the message
+    try:
+        send_mail(text=msg, to_emails=[to_email], html=None)
+        sent = True
+    except:
+        sent = False
+    return f"Message sent? {sent}"
 
 
 # Non-pythonic way of automatically running our function
@@ -35,9 +41,12 @@ if __name__ == "__main__":
     print(sys.argv)  # command line args passed ['send.py', 'abc', 'yada']
 
     name = "Unknown"
-
     if len(sys.argv) > 1:
         name = sys.argv[1]
 
-    response = send(name, verbose=True)
+    email = None
+    if len(sys.argv) > 2:
+        email = sys.argv[2]
+
+    response = send(name=name, to_email=email, verbose=True)
     print(response)
