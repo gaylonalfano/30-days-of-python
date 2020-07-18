@@ -44,9 +44,13 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         name = sys.argv[1]
 
-    email = None
+    website = None
     if len(sys.argv) > 2:
-        email = sys.argv[2]
+        website = sys.argv[2]
 
-    response = send(name=name, to_email=email, verbose=True)
+    email = None
+    if len(sys.argv) > 3:
+        email = sys.argv[3]
+
+    response = send(name=name, website=website, to_email=email, verbose=True)
     print(response)
