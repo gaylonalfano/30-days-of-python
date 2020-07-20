@@ -1,0 +1,1 @@
+Hello! My file path is: /Users/gaylonalfano/Code/30-days-of-python/10-files-create-read-download/images/8.txt

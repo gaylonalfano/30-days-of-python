@@ -91,6 +91,8 @@ target/
 ## File-based project format:
 *.ipr
 *.iws
+*.jpeg
+*.jpg
 
 ## Plugin-specific files:
 
