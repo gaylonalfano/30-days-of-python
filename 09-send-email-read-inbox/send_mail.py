@@ -16,6 +16,7 @@ def send_mail(
     to_emails: t.List[str] = [],
     html=None,
 ):
+
     assert isinstance(to_emails, list)
     assert username is not None
     assert password is not None
