@@ -76,14 +76,16 @@ class Template:
         else:
             # Set to new context that was passed to render
             render_context = context
-        print(render_context, type(render_context))
+        # print(render_context, type(render_context))
 
         # Convert render_context to empty dict object for string formatting
         if not isinstance(render_context, dict):
             # render_context = {}
             # Set a default 'name' key value for string formatting or error
             render_context = {"name": "Unknown"}
-        print(render_context, type(render_context))
+        # print(render_context, type(render_context))
+
+        template_content_string: str = self.get_template()
 
         # Unpack dict: {'name': 'Amy'} -> name='Amy'
-        return self.get_template().format(**render_context)
+        return template_content_string.format(**render_context)
