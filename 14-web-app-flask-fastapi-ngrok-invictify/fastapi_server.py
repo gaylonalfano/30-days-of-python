@@ -24,6 +24,8 @@ NOTES:
       Trigger <id: a38184a0-713d-417b-b2e7-e8894b21d74d> triggers http://a8a7ca3ccc62.ngrok.io/box-office-mojo-scraper every hour
     - Created logger.py for logging webhook history
     - MUST restart server after making changes (save logs)! No hot-reloading configured.
+    - Could have it send emails on a schedule. Just change endpoint logic.
+    - Ideally we set this up on a hosted server (instead of Ngrok)
 """
 # Start server:  uvicorn fastapi_server:app
 app = FastAPI()
