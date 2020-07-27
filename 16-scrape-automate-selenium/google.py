@@ -9,11 +9,15 @@ NOTES:
       'class' or 'id' attributes. 'name' is how it functions (not its look)
     - Use webdriver.find_element_by_name() to find name='q'
     - Use search_element.send_keys("selenium python")
-    - Submit search by finding <input type='submit'/> or <button type='submit'/>
+    - Submit search by finding <input type='submit'/>, <button type='submit'/>
     - The type='submit' WILL override the 'name' attr for submit buttons.
       This is different from input boxes.
     - Use find_element_by_css_selector("input[type='submit']")
     - Use submit_button_element.click() to submit query
+    - Use getpass library for secure password storage
+    - Use requests-html to scrape homepage (r.html.links, r.html.find(), etc.)
+    - Use browser.find_elements_by_xpath for advanced css_selector replacement
+    - Can pass browser session as arg to a function click_to_follow(browser)
 """
 
 """
