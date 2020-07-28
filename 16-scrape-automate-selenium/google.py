@@ -2,9 +2,7 @@ import time
 from selenium import webdriver
 
 """
-NOTES:
-    - GET a url and then need to find <input type='text' /> for input box
-      For our purposes it's: <input name="q" type="text"/>
+NOTES: - GET a url and then need to find <input type='text' /> for input box For our purposes it's: <input name="q" type="text"/>
     - HTML 'name' attribute comes/relies on backend so harder to change than
       'class' or 'id' attributes. 'name' is how it functions (not its look)
     - Use webdriver.find_element_by_name() to find name='q'

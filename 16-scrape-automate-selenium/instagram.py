@@ -251,4 +251,4 @@ def automate_like(browser):
 
 
 # Call the automate_like() function
-automate_like(browser)
+# automate_like(browser)
