@@ -18,6 +18,17 @@ NOTES:
     - Use requests-html to scrape homepage (r.html.links, r.html.find(), etc.)
     - Use browser.find_elements_by_xpath for advanced css_selector replacement
     - Can pass browser session as arg to a function click_to_follow(browser)
+    - Use post_xpath: str = "//a[contains(@href, '/p/')]" for finding <a> tags
+    - Can use from urllib.parse import urlparse to parse URL into 6 parts
+    - Need to use 'wb' (write bytes) to save images and videos
+    - Use PIL to verify the size of any given image. If a size doesn't meet
+      criteria you could save empty file (no data) so it is skipped in future
+      runs (if os.path.exists: continue).
+    - Could add a parent dir for each user with its own /data sub-directory
+    - LONG TERM GOAL: Use ML to classify post's image/video and then comment
+      in a relevant fashion.
+    - Cannot element.click() an SVG need parent element. You can chain the
+      find_elements_by...() methods: parent=el.find_element_by_xpath('..')
 """
 
 """
