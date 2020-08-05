@@ -3,6 +3,15 @@ from sqlalchemy import create_engine, Column, String, Integer
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+"""
+NOTES:
+    - You can reverse engineer the code that made up the database?
+      Essentially, how to make SQLA code correspond to a pre-existing
+      database (e.g., sqlite:///app.db)? Specifically, the Model code
+      that we made to create the tables? Can use a package called
+      'sqlacodegen'. In terminal run: 'sqlacodegen sqlite:///app.db'
+
+"""
 
 # Connect to a database by declaring the engine we're using (sqlite3)
 # You'd pass in credentials to this engine object
