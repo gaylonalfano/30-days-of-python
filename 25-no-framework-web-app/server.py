@@ -1,5 +1,3 @@
-import typing as t
-
 """
 NOTES:
     - Whenever you use a web app you're going to have an app
@@ -51,6 +49,11 @@ NOTES:
 CHALLENGE:
     - Could leverage CSV storage (instead of a full DB) and then
       try to render things to these different routes.
+    - Can customize specific path/route handler and return more data inside
+      the 'context' Dict (e.g, "qs", "movies"). Need to add conditions to
+      check whether a query string has been passed and then parse.
+    - ? Not sure if that's the best way but I got it to work. Wondering how
+      frameworks actually render the HTML.
 
 
 
@@ -115,9 +118,19 @@ SERVER_PORT 8000
 PATH_INFO /
 SCRIPT_NAME
 """
+# ====== CHALLENGE: Pulling data from CSV to display on different routes
+import os
+import typing as t
+import pandas as pd
 
-# ====== Advanced: Handling MULTIPLE routes with helper functions
-# gunicorn
+
+# Access our data
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # 25-no-framework-web-app
+DATA_DIR = os.path.join(BASE_DIR, "data")  # /data
+dataset = os.path.join(DATA_DIR, "movies-box-office-dataset-cleaned.csv")
+
+
+# Added box-office data from day 17
 def render_template(
     template_name: str = "index.html", context: t.Dict[str, str] = {}
 ):
@@ -164,6 +177,44 @@ def contact_us(environ):
     )
 
 
+def read_box_office_data(environ):
+    """
+    Route handler for /box-office path. Trying to mimic
+    FastAPI routing handler to display the movies data.
+    """
+    df = pd.read_csv(dataset)
+    data = df.to_dict("Rank")
+
+    # NOTE: Add QUERY_STRING for number of movies to display
+    query_str: str = environ.get("QUERY_STRING")
+    print(query_str)
+
+    # Add a query string to specify number of records to return
+    if query_str == "":
+        # Do I pass in the data via context? Can I return "data": df.to_dict("Rank")?
+        # print(df.to_dict("Rank")[0])  # List[0] -> Dict
+        return render_template(
+            template_name="box_office.html",
+            context={"path": environ.get("PATH_INFO"), "data": data},
+        )
+    else:
+        # Only single-digit numbers for now. Could parse further to
+        # get the actual value. Don't see anything in the request obj
+        # specifically. Could find '=' then take everything after and
+        # convert to INT.
+        num_movies: int = int(query_str.split("=")[-1])  # movies=5 -> 5
+        print(num_movies, type(num_movies))
+        return render_template(
+            template_name="box_office.html",
+            context={
+                "path": environ.get("PATH_INFO"),
+                "data": data[:num_movies],
+                "qs": query_str,
+                "movies": num_movies,
+            },
+        )
+
+
 def app(environ: t.Dict, start_response):
     """Expand app by adding routing by checking the path/route
     that is in the request (stored in 'environ') to render different
@@ -184,6 +235,8 @@ def app(environ: t.Dict, start_response):
         data = home(environ)
     elif path == "/contact":
         data = contact_us(environ)
+    elif path == "/box-office":
+        data = read_box_office_data(environ)
     else:
         data = render_template(template_name="404.html", context={"path": path})
 
@@ -200,6 +253,92 @@ def app(environ: t.Dict, start_response):
     # Where does this print to? Server logs I bet... YES!
     # print(f"{data=}\n{iter([data])}")
     return iter([data])  # <list_iterator object at 0x10f9f1340>
+
+
+# # ====== Advanced: Handling MULTIPLE routes with helper functions
+# # gunicorn
+# def render_template(
+#     template_name: str = "index.html", context: t.Dict[str, str] = {}
+# ):
+#     """
+#     Render HTML instead of plain text. This will now
+#     be the 'data/payload' that we send.
+
+#     We read the template_name file's HTML and return that HTML.
+#     """
+#     html_str: str
+#     with open(template_name, "r") as f:
+#         html_str = f.read()
+#         html_str = html_str.format(**context)
+#     return html_str
+#     # return f"<h1>Hello {path=}</h1>\n{template_name=}"
+
+
+# # Create some route handler functions
+# def home(environ):
+#     """
+#     This is a route handler/function!
+
+#     Helper function to handle the homepage route by returning
+#     the 'index.html' template.
+
+#     We don't need to pass anything to context for the index/root
+#     page.
+
+#     Params:
+#         environ = The actual request object
+#     """
+#     return render_template(template_name="index.html", context={})
+
+
+# def contact_us(environ):
+#     """
+#     This is a route handler/function!
+
+#     Params:
+#         environ = The actual request object
+#     """
+#     return render_template(
+#         template_name="contact.html", context={"path": environ.get("PATH_INFO")}
+#     )
+
+
+# def app(environ: t.Dict, start_response):
+#     """Expand app by adding routing by checking the path/route
+#     that is in the request (stored in 'environ') to render different
+#     things based on the specific routes."""
+#     # Print the request object details in environ.items()
+#     for k, v in environ.items():
+#         print(k, v)
+
+#     # Let's capture the request path
+#     path = environ.get("PATH_INFO")
+
+#     # Handle our different routes. Render different templates.
+#     # Allow user to add "/" or not to URL string
+#     # NOTE: Don't use elif statement! It skips 'data' assignment!
+#     if path.endswith("/"):
+#         path = path[:-1]  # remove the trailing "/"
+#     if path == "":  # the root / index
+#         data = home(environ)
+#     elif path == "/contact":
+#         data = contact_us(environ)
+#     else:
+#         data = render_template(template_name="404.html", context={"path": path})
+
+#     # Encode data to BYTE string
+#     data = data.encode("utf-8")
+
+#     # Gunicorn's start_response to get a response going
+#     start_response(
+#         f"200 OK",
+#         [("Content-Type", "text/html"), ("Content-Length", str(len(data)))],
+#         # You can remove these headers and the browser will still parse it.
+#         # Modern browsers are smart enough to infer how to parse the request
+#     )
+#     # Where does this print to? Server logs I bet... YES!
+#     # print(f"{data=}\n{iter([data])}")
+#     return iter([data])  # <list_iterator object at 0x10f9f1340>
 
 
 # # ====== Basic w/o any routes
@@ -278,4 +417,3 @@ def app(environ: t.Dict, start_response):
 #     # Where does this print to? Server logs I bet... YES!
 #     # print(f"{data=}\n{iter([data])}")
 #     return iter([data])  # <list_iterator object at 0x10f9f1340>
-
